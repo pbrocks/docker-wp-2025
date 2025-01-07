@@ -1,0 +1,85 @@
+#  file that starts your WordPress instance with MySQL
+#  instance and volume mounts for data persistence:
+
+services:
+    wp_db:
+        image: "mysql/mysql-server:8.0"
+        container_name: wp_mysql8
+        ports:
+            - "${FORWARD_DB_PORT:-3306}:3306"
+        volumes:
+            - db_data:/var/lib/mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: somewordpress
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: wordpress
+        networks:
+            - wp_docker
+    wp_web:
+        depends_on:
+            - wp_db
+        image: wordpress:latest
+        container_name: wp_web
+        volumes:
+            - ./developing:/var/www/html/wp-content/plugins/developing
+            - wp_data:/var/www/html
+        ports:
+            - "${WP_URL:-8000}:80"
+        restart: always
+        networks:
+            - wp_docker
+        environment:
+            WORDPRESS_DB_HOST: wp_db
+            WORDPRESS_DB_USER: wordpress
+            WORDPRESS_DB_PASSWORD: wordpress
+            WORDPRESS_DB_NAME: wordpress
+    wp_mailpit:
+        image: "axllent/mailpit:latest"
+        container_name: wp_mailpit
+        ports:
+            - "${FORWARD_MAILPIT_PORT:-1025}:1025"
+            - "${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025"
+        networks:
+            - wp_docker
+    wp_pma:
+        image: phpmyadmin/phpmyadmin
+        container_name: wp_pma
+        environment:
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: wordpress
+            MYSQL_ROOT_PASSWORD: wordpress
+            MYSQL_ROOT_HOST: "%"
+            PMA_HOST: wp_db
+            UPLOAD_LIMIT: 300M
+        networks:
+            - wp_docker
+        depends_on:
+            - wp_db
+        ports:
+            - "${FORWARD_PMA_PORT:-8306}:80"
+    # wp_docs:
+    #     build:
+    #     dockerfile: ./docker/docs/Dockerfile
+    #     args:
+    #         DOCS_PORT: ${DOCS_PORT:-9000}
+    #         APP_NAME: ${APP_NAME}
+    #     container_name: wp_docs
+    #     ports:
+    #         - "${DOCS_PORT:-9000}:90"
+    # Expose the Sphinx server
+    # - "${DOCS_PORT}:${DOCS_PORT}"
+    # volumes:
+    # Mount the local docs directory into the container
+    # - ./docs:/docs
+    # networks:
+    # - wp_docker
+
+volumes:
+    db_data: {}
+    wp_data: {}
+
+networks:
+    wp_docker:
+        driver: bridge

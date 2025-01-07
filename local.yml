@@ -1,0 +1,67 @@
+#  file that starts your WordPress instance with MySQL
+#  instance and volume mounts for data persistence:
+
+services:
+    wp_db:
+        image: "mysql/mysql-server:8.0"
+        volumes:
+            - db_data:/var/lib/mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: somewordpress
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: wordpress
+        networks:
+            - wp_docker
+    adminer:
+        image: adminer
+        restart: always
+        networks:
+            - wp_docker
+        ports:
+            - 8484:8484
+    wp_web:
+        depends_on:
+            - wp_db
+        image: wordpress:latest
+        volumes:
+            - ./developing:/var/www/html/wp-content/plugins/developing
+            - wp_data:/var/www/html
+        ports:
+            - 8000:80
+        restart: always
+        networks:
+            - wp_docker
+        environment:
+            WORDPRESS_DB_HOST: wp_db
+            WORDPRESS_DB_USER: wordpress
+            WORDPRESS_DB_PASSWORD: wordpress
+            WORDPRESS_DB_NAME: wordpress
+    wp_mailpit:
+        image: "axllent/mailpit:latest"
+        container_name: wp_mailpit
+        ports:
+            - 1026:1025
+            - 8026:8025
+        networks:
+            - wp_docker
+    wp_pma:
+        image: phpmyadmin/phpmyadmin
+        container_name: wp_pma
+        environment:
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: wordpress
+            MYSQL_ROOT_PASSWORD: wordpress
+            MYSQL_ROOT_HOST: "%"
+            PMA_HOST: wp_db
+            UPLOAD_LIMIT: 300M
+        networks:
+            - wp_docker
+        depends_on:
+            - wp_db
+        ports:
+            - 8306:80
+volumes:
+    db_data: {}
+    wp_data: {}
