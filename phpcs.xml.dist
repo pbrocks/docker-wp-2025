@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<ruleset name="TAG WordPress Coding Standards">
+    <description>Project-level coding standards for WordPress projects. Use composer locally.</description>
+
+    <!-- Specify the directories to scan -->
+    <file>wp-content/themes</file>
+    <file>wp-content/plugins</file>
+
+    <!-- Exclude certain directories -->
+    <exclude-pattern>vendor/*</exclude-pattern>
+
+	<!-- Exclude the Node Modules directory. -->
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+
+	<!-- Exclude minified Javascript files. -->
+	<exclude-pattern>*.min.js</exclude-pattern>
+
+    <!-- Include the main WordPress ruleset -->
+    <rule ref="WordPress">
+        <!-- Exclude the WordPress-Core standard -->
+        <exclude-pattern>WordPress-Core/*</exclude-pattern>
+        <!-- Exclude all PHPCSUtils-dependent sniffs -->
+        <exclude-pattern>PHPCSUtils.*</exclude-pattern>
+    </rule>
+
+    <!-- Severity levels for warnings and errors -->
+    <arg name="warning-severity" value="6"/>
+    <arg name="error-severity" value="5"/>
+</ruleset>

@@ -10,7 +10,7 @@
 Repository
 -----------------
 
-The Repository located here: https://bitbucket.org/theapiguys/diligent-portal/ manages the setup of all relevant accounts for the FunderTrading Project. Namely:
+The Repository located here: https://github.com/pbrocks/docker-wp-2025 manages the setup of all relevant accounts for the FunderTrading Project. Namely:
 
 - Keap (Infusionsoft)
 - Sterling
