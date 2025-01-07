@@ -26,6 +26,7 @@ services:
         container_name: wp_web
         volumes:
             - ./developing:/var/www/html/wp-content/plugins/developing
+            - ./child-theme:/var/www/html/wp-content/themes/child-theme
             - wp_data:/var/www/html
         ports:
             - "${WP_PORT:-8000}:80"
@@ -63,14 +64,14 @@ services:
             - "${FORWARD_PMA_PORT:-8306}:80"
     wp_docs:
         build:
-        dockerfile: ./docker/docs/Dockerfile
-        args:
-            DOCS_PORT: ${DOCS_PORT:-9000}
-            APP_NAME: ${APP_NAME}
+            dockerfile: ./docker/docs/Dockerfile
+            args:
+                DOCS_PORT: ${DOCS_PORT:-9000}
+                APP_NAME: ${APP_NAME}
         container_name: wp_docs
         ports:
             # Expose the Sphinx server
-            - "${DOCS_PORT:-9000}:90"
+            - "${DOCS_PORT:-9000}:${DOCS_PORT}"
         volumes:
             # Mount the local docs directory into the container
             - ./docs:/docs
