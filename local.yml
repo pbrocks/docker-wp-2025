@@ -26,6 +26,7 @@ services:
         container_name: wp_web
         volumes:
             - ./developing:/var/www/html/wp-content/plugins/developing
+            - ./child-theme:/var/www/html/wp-content/themes/child-theme
             - wp_data:/var/www/html
         ports:
             - "${WP_PORT:-8000}:80"
